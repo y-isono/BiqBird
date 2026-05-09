@@ -21,8 +21,15 @@ $$ w(x_1,x_2) = \frac{1}{\sqrt{(x_1-x_2)^2 + 1}} $$
 
 $$ E[\psi] = 2 \langle \psi | \hat{h}_2 | \psi \rangle + \iint |\psi(x_1)|^2 w(x_1,x_2) |\psi(x_2)|^2 dx_1 dx_2 $$
 
-虚時間 Schrödinger 方程式 $\partial_\tau \psi = -\hat{F}[\psi]\, \psi$ を RK4 で時間発展（毎ステップ正規化）して基底状態に緩和する。
-He の場合 $\hat{F}[\psi] = \hat{h}_2 + \hat{W}_{\rho}$ で、 $\hat{W}_{\rho}$ は密度 $\rho = \lvert \psi \rvert^2$ から作る Hartree ポテンシャル（自己相互作用込み・閉殻 2 電子なので係数 1）。
+虚時間 Schrödinger 方程式
+
+$$ \partial_\tau \psi = -\hat{F}[\psi]\, \psi $$
+
+を RK4 で時間発展（毎ステップ正規化）して基底状態に緩和する。He の場合
+
+$$ \hat{F}[\psi] = \hat{h}_2 + \hat{W}_\rho $$
+
+で、 $\hat{W}_\rho$ は密度 $\rho = \lvert \psi \rvert^2$ から作る Hartree ポテンシャル（自己相互作用込み・閉殻 2 電子なので係数 1）。
 
 ---
 
