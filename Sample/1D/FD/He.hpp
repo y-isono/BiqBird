@@ -207,7 +207,11 @@ public:
             double x2 = -x_range + (igrid % ngrid) * dx;
 
             double dx2 = pow(x1 - x2, 2);
-            V12[igrid] = dx / sqrt(dx2 + 1.0);
+            // V12 stores the *physical* electron-electron interaction
+            //   w(x1, x2) = 1 / sqrt((x1 - x2)^2 + 1).
+            // Discretization weights (dx, dx^2, ...) are applied at the
+            // call site (Hartree potential, two-electron energy).
+            V12[igrid] = 1.0 / sqrt(dx2 + 1.0);
         }
     }
 
@@ -220,6 +224,10 @@ public:
         return V12[i];
     }
 
+    // Continuous Hartree potential
+    //   W(x1) = ∫ w(x1, x2) |ψ(x2)|^2 dx2
+    // discretized with the trapezoid/midpoint rule:
+    //   W_α = Σ_β V12_{αβ} · |ψ_β|^2 · dx
     vector<complex<double>> hartree_potential(const spatial_orbital_1d &orb) const
     {
         vector<complex<double>> density(ngrid);
@@ -235,6 +243,11 @@ public:
             int ix1 = i / ngrid;
             int ix2 = i % ngrid;
             potential[ix1] += V12[i] * density[ix2];
+        }
+        // multiply by dx for the integration over x2
+        for (int i = 0; i < ngrid; i++)
+        {
+            potential[i] *= dx;
         }
 
         return potential;
@@ -293,12 +306,17 @@ spatial_orbital_1d hamiltonian(const spatial_orbital_1d orb, const coulomb_inter
     }
 
     // Calculate Hartree potential using V12 matrix directly
+    //   W_α = (Σ_β V12_{αβ} · ρ_β) · dx     (dx is the integration weight over x2)
     vector<complex<double>> hartree(ngrid, 0.0);
     for (int i = 0; i < ngrid * ngrid; i++)
     {
         int ix = i / ngrid;
         int iy = i % ngrid;
         hartree[ix] += two_e_int[i] * rho[iy];
+    }
+    for (int i = 0; i < ngrid; i++)
+    {
+        hartree[i] *= dx;
     }
 
     for (int i = 0; i < ngrid; i++)
@@ -405,12 +423,13 @@ double one_electron_energy(const spatial_orbital_1d orb)
     return real(braket(dx, orb, one_electron_hamiltonian(orb)));
 }
 
+// Two-electron (Hartree) energy:
+//   E2 = ∫∫ |ψ(x1)|^2 w(x1, x2) |ψ(x2)|^2 dx1 dx2
+//      ≈ Σ_{α, β} ρ_α · V12_{αβ} · ρ_β · (dx)^2
 double two_electron_energy(const spatial_orbital_1d orb, const coulomb_interaction_1d two_e_int)
 {
     int ngrid = orb.get_ngrid();
     double dx = orb.get_dx();
-
-    double e1 = 2.0 * real(braket(dx, orb, one_electron_hamiltonian(orb)));
 
     vector<complex<double>> rho(ngrid);
     for (int i = 0; i < ngrid; i++)
@@ -432,7 +451,8 @@ double two_electron_energy(const spatial_orbital_1d orb, const coulomb_interacti
         e2 += v12rho[i] * rho[i];
     }
 
-    return real(e2);
+    // Two integration weights: one for x1, one for x2.
+    return real(e2) * dx * dx;
 }
 
 spatial_orbital_1d rk4_gs(const double dtau, const spatial_orbital_1d orb, const coulomb_interaction_1d two_e_int)
