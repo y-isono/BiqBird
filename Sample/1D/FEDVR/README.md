@@ -43,7 +43,11 @@ $$ -L = X_0 < X_1 < \cdots < X_{N_e} = L $$
 
 $$ \Delta_i = X_{i+1} - X_i = \frac{2L}{N_e} $$
 
-各要素 $\mathcal{E}_i = [X_i, X_{i+1}]$ 内に **Gauss–Lobatto–Legendre (GLL) 求積点** （次数 $n$ 、 $n+1$ 点、両端点を含む）と重み $w^{(i)}_k$ を取る：
+各要素 $i$ の区間
+
+$$ \mathcal{E}_i = [X_i, X_{i+1}] $$
+
+の内部に **Gauss–Lobatto–Legendre (GLL) 求積点** （次数 $n$ 、 $n + 1$ 点、両端点を含む）と重み $w^{(i)}_k$ を取る：
 
 $$ \xi^{(i)}_0 = X_i, \quad \xi^{(i)}_1, \ldots, \xi^{(i)}_{n-1}, \quad \xi^{(i)}_n = X_{i+1} $$
 
