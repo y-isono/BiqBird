@@ -20,43 +20,29 @@
 
 ### H 原子（1電子）
 
-$$
-i \frac{\partial}{\partial t}\psi(x,t) = \hat{H}\psi(x,t)
-$$
+$$ i \frac{\partial}{\partial t}\psi(x,t) = \hat{H}\psi(x,t) $$
 
-$$
-\hat{H} = -\tfrac{1}{2}\frac{d^2}{dx^2} - \frac{1}{\sqrt{x^2+1}} + E(t)\,x
-$$
+$$ \hat{H} = -\frac{1}{2}\frac{d^2}{dx^2} - \frac{1}{\sqrt{x^2+1}} + E(t) x $$
 
 ### He 原子（2電子・閉殻、Hartree平均場）
 
-$$
-\hat{H} = \hat{h}(t) + \hat{W}[\rho]
-$$
+$$ \hat{H} = \hat{h}(t) + \hat{W}[\rho] $$
 
-$$
-\hat{h}(t) = -\tfrac{1}{2}\frac{d^2}{dx^2} - \frac{2}{\sqrt{x^2+1}} + E(t)\,x,
-\qquad
-\hat{W}[\rho](x) = \int \frac{\rho(x')}{\sqrt{(x-x')^2 + 1}}\, dx',
-\quad \rho(x) = |\psi(x)|^2
-$$
+$$ \hat{h}(t) = -\frac{1}{2}\frac{d^2}{dx^2} - \frac{2}{\sqrt{x^2+1}} + E(t) x $$
+
+$$ \hat{W}[\rho](x) = \int \frac{\rho(x')}{\sqrt{(x-x')^2 + 1}} dx' $$
+
+$$ \rho(x) = |\psi(x)|^2 $$
 
 エネルギー期待値は
 
-$$
-E[\psi] = 2\,\langle\psi|\hat{h}|\psi\rangle
-        + \iint |\psi(x_1)|^2\, \frac{1}{\sqrt{(x_1-x_2)^2+1}}\, |\psi(x_2)|^2\, dx_1 dx_2
-$$
+$$ E[\psi] = 2 \langle\psi|\hat{h}|\psi\rangle + \iint |\psi(x_1)|^2 \frac{1}{\sqrt{(x_1-x_2)^2+1}} |\psi(x_2)|^2 dx_1 dx_2 $$
 
 ### 虚時間緩和（基底状態の求め方）
 
 $t \to -i\tau$ の置換により、
 
-$$
-i\frac{d}{dt}\Psi(t) = H_0\Psi(t)
-\;\longrightarrow\;
-\frac{d}{d\tau}\Psi(-i\tau) = -H_0\,\Psi(-i\tau)
-$$
+$$ i\frac{d}{dt}\Psi(t) = H_0\Psi(t) \longrightarrow \frac{d}{d\tau}\Psi(-i\tau) = -H_0 \Psi(-i\tau) $$
 
 これを4次ルンゲクッタで進め、毎ステップ L²正規化することで基底状態に収束させる。
 

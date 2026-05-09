@@ -16,14 +16,14 @@
 
 ## ハミルトニアン
 
-$$
-\hat{H}_{\rm H} = -\tfrac12\frac{d^2}{dx^2} - \frac{1}{\sqrt{x^2+1}}, \qquad
-\hat{H}_{\rm He} = \sum_{i=1}^{2}\Big(-\tfrac12\nabla_i^2 - \frac{2}{\sqrt{x_i^2+1}}\Big)
-                  + \frac{1}{\sqrt{(x_1-x_2)^2+1}}
-$$
+$$ \hat{H}_{\rm H} = -\frac{1}{2}\frac{d^2}{dx^2} - \frac{1}{\sqrt{x^2+1}} $$
 
-閉殻 He は単一空間軌道 $\psi(x)$ で
-$E[\psi] = 2\,\langle\psi|\hat{h}|\psi\rangle + \iint |\psi(x_1)|^2\, w(x_1,x_2)\, |\psi(x_2)|^2\, dx_1 dx_2$
+$$ \hat{H}_{\rm He} = \sum_{i=1}^{2}\left(-\frac{1}{2}\nabla_i^2 - \frac{2}{\sqrt{x_i^2+1}}\right) + \frac{1}{\sqrt{(x_1-x_2)^2+1}} $$
+
+閉殻 He は単一空間軌道 $\psi(x)$ について
+
+$$ E[\psi] = 2 \langle\psi|\hat{h}|\psi\rangle + \iint |\psi(x_1)|^2 w(x_1,x_2) |\psi(x_2)|^2 dx_1 dx_2 $$
+
 を最小化する形で解く。
 
 ## 数値手法
@@ -49,12 +49,12 @@ g++ -std=c++17 -O2 He_GS.cpp -o out/he_gs  && ./out/he_gs
 
 ## 検証結果
 
-He 原子（$x\_{\rm range}=20$, $dx=0.4$）：
+He 原子（$x_{\rm range}=20$, $dx=0.4$）：
 
 | 量 | 値 [a.u.] |
 |---|---|
 | $E_{\rm tot}$ | -2.22837 |
-| $E_1 = 2\langle\psi\|\hat h\|\psi\rangle$ | -2.94721 |
+| $E_1 = 2\langle\psi\vert\hat h\vert\psi\rangle$ | -2.94721 |
 | $E_2$ (Hartree) | 0.71884 |
 | 収束反復数 | 239 |
 
