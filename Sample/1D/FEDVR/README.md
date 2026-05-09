@@ -22,7 +22,7 @@ $$ w(x_1,x_2) = \frac{1}{\sqrt{(x_1-x_2)^2 + 1}} $$
 $$ E[\psi] = 2 \langle \psi | \hat{h}_2 | \psi \rangle + \iint |\psi(x_1)|^2 w(x_1,x_2) |\psi(x_2)|^2 dx_1 dx_2 $$
 
 虚時間 Schrödinger 方程式 $\partial_\tau \psi = -\hat F[\psi] \psi$ を RK4 で時間発展（毎ステップ正規化）して基底状態に緩和する。
-He の場合 $\hat F[\psi] = \hat{h}_2 + W[|\psi|^2]$ で、$W$ は Hartree（自己相互作用込み・閉殻 2 電子なので係数 1）。
+He の場合 $\hat F[\psi] = \hat{h}_2 + \hat W_{\rho}$ で、$\hat W_{\rho}$ は密度 $\rho = |\psi|^2$ から作る Hartree ポテンシャル（自己相互作用込み・閉殻 2 電子なので係数 1）。
 
 ---
 
@@ -138,7 +138,7 @@ $$ T_{\alpha\beta} = \frac{T^{(i)}_{kl}}{\sqrt{w_\alpha}\sqrt{w_\beta}} $$
 
 ### 3.3 Hartree 項（DVR 近似）
 
-$$ W[\rho](x_\alpha) = \int w(x_\alpha, x') \rho(x') dx' \approx \sum_\beta w(x_\alpha, x_\beta) w_\beta \rho_\beta $$
+$$ W_{\rho}(x_\alpha) = \int w(x_\alpha, x') \rho(x') dx' \approx \sum_\beta w(x_\alpha, x_\beta) w_\beta \rho_\beta $$
 
 ここで密度 $\rho_\beta = |\psi(x_\beta)|^2 = |c_\beta|^2 / w_\beta$ なので、**点値演算**で
 
@@ -166,7 +166,7 @@ $$ \|\psi\|^2 = \sum_\alpha |c_\alpha|^2 $$
 
 $$ \partial_\tau \mathbf c = -\hat F[\mathbf c] \mathbf c $$
 
-$$ \hat F = T + \mathrm{diag}(V_{\rm ne}) + \mathrm{diag}(W[|c|^2]) \quad (\text{He のみ}) $$
+$$ \hat F = T + \mathrm{diag}(V_{\rm ne}) + \mathrm{diag}(\hat W_{\rho}) \quad (\text{He のみ}) $$
 
 を 4 段 RK4 で進めて毎ステップ正規化（`FD/He.hpp` の `rk4_gs` と同じパターン）。
 

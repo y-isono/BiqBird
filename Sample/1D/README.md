@@ -26,11 +26,11 @@ $$ \hat{H} = -\frac{1}{2}\frac{d^2}{dx^2} - \frac{1}{\sqrt{x^2+1}} + E(t) x $$
 
 ### He 原子（2電子・閉殻、Hartree平均場）
 
-$$ \hat{H} = \hat{h}(t) + \hat{W}[\rho] $$
+$$ \hat{H} = \hat{h}(t) + \hat{W}_{\rho} $$
 
 $$ \hat{h}(t) = -\frac{1}{2}\frac{d^2}{dx^2} - \frac{2}{\sqrt{x^2+1}} + E(t) x $$
 
-$$ \hat{W}[\rho](x) = \int \frac{\rho(x')}{\sqrt{(x-x')^2 + 1}} dx' $$
+$$ \hat{W}_{\rho}(x) = \int \frac{\rho(x')}{\sqrt{(x-x')^2 + 1}} dx' $$
 
 $$ \rho(x) = |\psi(x)|^2 $$
 
