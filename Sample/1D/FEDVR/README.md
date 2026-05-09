@@ -36,9 +36,9 @@ $$ -L = X_0 < X_1 < \cdots < X_{N_e} = L $$
 
 $$ \Delta_i = X_{i+1} - X_i = \frac{2L}{N_e} $$
 
-各要素 $\mathcal E_i = [X_i, X_{i+1}]$ 内に **Gauss–Lobatto–Legendre (GLL) 求積点**
-$\xi^{(i)}_0 = X_i, \xi^{(i)}_1, \ldots, \xi^{(i)}_{n-1}, \xi^{(i)}_n = X_{i+1}$
-（次数 $n$、$n+1$点、両端点を含む）と重み $w^{(i)}_k$ を取る。
+各要素 $\mathcal E_i = [X_i, X_{i+1}]$ 内に **Gauss–Lobatto–Legendre (GLL) 求積点**（次数 $n$、$n+1$点、両端点を含む）と重み $w^{(i)}_k$ を取る：
+
+$$ \xi^{(i)}_0 = X_i, \quad \xi^{(i)}_1, \ldots, \xi^{(i)}_{n-1}, \quad \xi^{(i)}_n = X_{i+1} $$
 
 実装上は標準区間 $[-1,1]$ の GLL 点 $\hat\xi_k$ と重み $\hat w_k$
 （ただし $\hat\xi_k$ は $P'_n(\xi)=0$ の根 + 端点 $\pm 1$、$\hat w_k = 2/[n(n+1)P_n(\hat\xi_k)^2]$）
@@ -54,7 +54,9 @@ $$ w^{(i)}_k = \frac{\Delta_i}{2}\hat w_k $$
 
 $$ f^{(i)}_k(x) = \prod_{l \neq k} \frac{x - \xi^{(i)}_l}{\xi^{(i)}_k - \xi^{(i)}_l}, \quad x \in \mathcal E_i $$
 
-要素外では 0。この関数族は **DVR 性** $f^{(i)}_k(\xi^{(i)}_l) = \delta_{kl}$ を満たす。
+要素外では 0。この関数族は **DVR 性** を満たす：
+
+$$ f^{(i)}_k(\xi^{(i)}_l) = \delta_{kl} $$
 
 ### 2.3 ブリッジ関数（要素境界の連続化）
 
@@ -75,12 +77,14 @@ $$ \chi_i(x) = \frac{f^{(i-1)}_n(x) + f^{(i)}_0(x)}{\sqrt{w^{(i-1)}_n + w^{(i)}_
 | ブリッジ点 | $N_e - 1$ | 要素境界（左端 $X_0$、右端 $X_{N_e}$ は除外＝Dirichlet 0境界条件） |
 | **合計** | $N = N_e (n - 1) + (N_e - 1) = N_e n - 1$ |
 
-各大域インデックス $\alpha \in \{0,\dots,N-1\}$ に対し、基底関数 $\phi_\alpha$ は次のように規格化：
+各大域インデックス $\alpha \in \{0,\dots,N-1\}$ に対し、基底関数 $\phi_\alpha$ は次のように規格化される。
+$\alpha$ が $i$ 番要素の内部点（ローカル番号 $k \in \{1,\dots,n-1\}$）に対応する場合は
 
-- 要素内部点 ($\alpha$ が $i$番要素のローカル $k \in \{1,\dots,n-1\}$ に対応)：
-  $\phi_\alpha(x) = f^{(i)}_k(x) / \sqrt{w^{(i)}_k}$
-- ブリッジ点 ($\alpha$ が境界 $X_i$, $i = 1,\dots,N_e-1$ に対応)：
-  $\phi_\alpha = \chi_i$
+$$ \phi_\alpha(x) = f^{(i)}_k(x) / \sqrt{w^{(i)}_k} $$
+
+$\alpha$ がブリッジ点（要素境界 $X_i$, $i = 1,\dots,N_e-1$）に対応する場合は
+
+$$ \phi_\alpha = \chi_i $$
 
 両端点 $X_0, X_{N_e}$ は対応基底を採用しない（境界 Dirichlet 0）。
 
@@ -90,12 +94,15 @@ $$ \phi_\alpha(x_\beta) = \frac{\delta_{\alpha\beta}}{\sqrt{w_\alpha}} $$
 
 $$ \langle \phi_\alpha | \phi_\beta \rangle \approx \delta_{\alpha\beta} \quad \text{(GLL 求積)} $$
 
-ここで $w_\alpha$ は「DVR 重み」と呼ばれる量で、
+ここで $w_\alpha$ は「DVR 重み」と呼ばれる量で、要素内部点では
 
-- 要素内部点：$w_\alpha = w^{(i)}_k$
-- ブリッジ点 $X_i$：$w_\alpha = w^{(i-1)}_n + w^{(i)}_0$
+$$ w_\alpha = w^{(i)}_k $$
 
-波動関数 $\psi(x) = \sum_\alpha c_\alpha \phi_\alpha(x)$ の係数は
+ブリッジ点 $X_i$ では
+
+$$ w_\alpha = w^{(i-1)}_n + w^{(i)}_0 $$
+
+である。波動関数 $\psi(x) = \sum_\alpha c_\alpha \phi_\alpha(x)$ の係数は
 **規格化点値** $c_\alpha = \sqrt{w_\alpha} \psi(x_\alpha)$ となり、$\sum_\alpha |c_\alpha|^2 = 1$ で L²規格化される。
 
 ---
@@ -122,7 +129,14 @@ $$ D^{(i)}_{mk} = f'^{(i)}_k(\xi^{(i)}_m) $$
 
 要素 $i$ 内部の Lagrange 微分行列 $D^{(i)}$（標準 GLL の場合 $D^{(i)} = (2/\Delta_i) \hat D$）の閉形式：
 
-$$ \hat D_{mk} = \begin{cases} \dfrac{P_n(\hat\xi_m)}{P_n(\hat\xi_k)}\dfrac{1}{\hat\xi_m - \hat\xi_k} & m \neq k \\ -\dfrac{n(n+1)}{4} & m = k = 0 \\ +\dfrac{n(n+1)}{4} & m = k = n \\ 0 & \text{otherwise} \end{cases} $$
+$$
+\hat D_{mk} = \begin{cases}
+\dfrac{P_n(\hat\xi_m)}{P_n(\hat\xi_k)}\dfrac{1}{\hat\xi_m - \hat\xi_k} & (m \neq k) \\
+-\dfrac{n(n+1)}{4} & (m = k = 0) \\
++\dfrac{n(n+1)}{4} & (m = k = n) \\
+0 & (\text{otherwise})
+\end{cases}
+$$
 
 これを使って **要素ローカル運動行列** ($n+1$ 次元実対称)：
 
