@@ -1,6 +1,6 @@
 # 1-D H/He atom — Finite Difference (FD) implementation
 
-有限差分（2次中心差分）+ 4次ルンゲクッタによる**虚時間発展**で、
+有限差分（2次中心差分）+ 4次ルンゲクッタによる **虚時間発展** で、
 1次元ソフトクーロンモデルにおける H 原子・He 原子の電子基底状態を求めるサンプル。
 
 物理ハミルトニアン（共通定義）は親ディレクトリ
@@ -29,7 +29,7 @@ $$ E[\psi] = 2 \langle\psi|\hat{h}|\psi\rangle + \iint |\psi(x_1)|^2 w(x_1,x_2) 
 ## 数値手法
 
 - 空間離散化：等間隔グリッド、2次中心差分（コメントに4次差分の試行あり）
-- 時間発展：虚時間 $\tau$ への置換 ($t \to -i\tau$) → $\partial_\tau \psi = -\hat{H}\psi$ を **RK4** で進行
+- 時間発展：虚時間 $\tau$ への置換（ $t \to -i\tau$ ） → $\partial_\tau \psi = -\hat{H}\, \psi$ を **RK4** で進行
 - 各ステップ後に L²正規化
 
 ## ビルド・実行例
@@ -49,12 +49,12 @@ g++ -std=c++17 -O2 He_GS.cpp -o out/he_gs  && ./out/he_gs
 
 ## 検証結果
 
-He 原子（$x_{\rm range}=20$, $dx=0.4$）：
+He 原子（ $x_{\rm range} = 20$ , $dx = 0.4$ ）：
 
 | 量 | 値 [a.u.] |
 |---|---|
 | $E_{\rm tot}$ | -2.22837 |
-| $E_1 = 2\langle\psi\vert\hat h\vert\psi\rangle$ | -2.94721 |
+| $E_1 = 2 \langle \psi \lvert \hat{h} \rvert \psi \rangle$ | -2.94721 |
 | $E_2$ (Hartree) | 0.71884 |
 | 収束反復数 | 239 |
 
