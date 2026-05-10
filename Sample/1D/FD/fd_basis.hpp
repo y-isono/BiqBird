@@ -146,6 +146,56 @@ inline Eigen::SparseMatrix<double> build_h_pq(const FDGrid &g, double Z)
     return h;
 }
 
+// ----------------------------------------------------------------------------
+// Multi-nucleus version of build_h_pq for 1D molecules (e.g. H2):
+//   V_ne(x) = - Σ_a Z_a / sqrt((x - X_a)^2 + 1)
+//
+// `Nucleus` carries the charge Z and 1D position X.
+// `nuclear_repulsion(nuclei)` returns the soft-Coulomb sum
+//   E_nn = Σ_{a<b} Z_a Z_b / sqrt((X_a - X_b)^2 + 1)
+// to be added to the electronic energy for the total potential surface.
+//
+// Mirrors fedvr::Nucleus / build_h_pq / nuclear_repulsion API so that the
+// downstream RHF solvers (in FEDVR/hf_fedvr.hpp) can be reused as-is.
+// ----------------------------------------------------------------------------
+struct Nucleus
+{
+    double Z;
+    double X;
+};
+
+inline Eigen::SparseMatrix<double> build_h_pq(const FDGrid &g,
+                                              const std::vector<Nucleus> &nuclei)
+{
+    Eigen::SparseMatrix<double> h = g.T;
+    for (int p = 0; p < g.N; ++p)
+    {
+        double Vp = 0.0;
+        for (const auto &nuc : nuclei)
+        {
+            const double dx = g.x(p) - nuc.X;
+            Vp -= nuc.Z / std::sqrt(dx * dx + 1.0);
+        }
+        h.coeffRef(p, p) += Vp;
+    }
+    h.makeCompressed();
+    return h;
+}
+
+inline double nuclear_repulsion(const std::vector<Nucleus> &nuclei)
+{
+    double E = 0.0;
+    for (size_t a = 0; a < nuclei.size(); ++a)
+    {
+        for (size_t b = a + 1; b < nuclei.size(); ++b)
+        {
+            const double dx = nuclei[a].X - nuclei[b].X;
+            E += nuclei[a].Z * nuclei[b].Z / std::sqrt(dx * dx + 1.0);
+        }
+    }
+    return E;
+}
+
 // Two-electron pair integrals:
 //   V_{pq} = w(x_p, x_q) = 1 / sqrt((x_p - x_q)^2 + 1)
 inline Eigen::MatrixXd build_V_pq(const FDGrid &g)

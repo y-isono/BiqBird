@@ -427,6 +427,54 @@ inline Eigen::SparseMatrix<double> build_h_pq(const FEDVRGrid &g, double Z)
 }
 
 // ----------------------------------------------------------------------------
+// Multi-nucleus version of build_h_pq for 1D molecules (e.g. H2):
+//   V_ext(x) = - Σ_a Z_a / sqrt((x - X_a)² + 1)
+// using a soft-Coulomb attraction centered at each nucleus.
+//
+// `Nucleus` carries the charge Z and 1D position X.
+// `nuclear_repulsion(nuclei)` returns the soft-Coulomb sum
+//   E_nn = Σ_{a<b} Z_a Z_b / sqrt((X_a - X_b)² + 1)
+// to be added to the electronic energy for the total potential surface.
+// ----------------------------------------------------------------------------
+struct Nucleus
+{
+    double Z;
+    double X;
+};
+
+inline Eigen::SparseMatrix<double> build_h_pq(const FEDVRGrid &g,
+                                              const std::vector<Nucleus> &nuclei)
+{
+    Eigen::SparseMatrix<double> h = g.T; // copy of kinetic-energy matrix
+    for (int p = 0; p < g.N; ++p)
+    {
+        double Vp = 0.0;
+        for (const auto &nuc : nuclei)
+        {
+            const double dx = g.x(p) - nuc.X;
+            Vp -= nuc.Z / std::sqrt(dx * dx + 1.0);
+        }
+        h.coeffRef(p, p) += Vp;
+    }
+    h.makeCompressed();
+    return h;
+}
+
+inline double nuclear_repulsion(const std::vector<Nucleus> &nuclei)
+{
+    double E = 0.0;
+    for (size_t a = 0; a < nuclei.size(); ++a)
+    {
+        for (size_t b = a + 1; b < nuclei.size(); ++b)
+        {
+            const double dx = nuclei[a].X - nuclei[b].X;
+            E += nuclei[a].Z * nuclei[b].Z / std::sqrt(dx * dx + 1.0);
+        }
+    }
+    return E;
+}
+
+// ----------------------------------------------------------------------------
 // Two-electron integral kernel in the FEDVR basis:
 //   V_{pq} = w(x_p, x_q) = 1 / sqrt((x_p - x_q)² + 1)
 //

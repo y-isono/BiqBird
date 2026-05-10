@@ -79,6 +79,39 @@ $$ i\frac{d}{dt}\Psi(t) = H_0\Psi(t) \longrightarrow \frac{d}{d\tau}\Psi(-i\tau)
 | FD ([`FD/Be_fd_HF.cpp`](FD/Be_fd_HF.cpp))           | $\Delta x = 0.2$ | 199 | $-6.74646782$ | 17 |
 | FEDVR ([`FEDVR/Be_fedvr_HF.cpp`](FEDVR/Be_fedvr_HF.cpp)) | $N_e = 10$, $n = 8$ | 79 | $-6.73934450$ | 16 |
 
+### H₂ 分子（核 2 個、$Z_a=Z_b=1$, 閉殻 RHF, $N_{\rm occ}=1$, $x_{\rm range}=20$）
+
+核間距離 $R$ をスキャンしてポテンシャル曲線 $E_{\rm tot}(R) = E_{\rm RHF}(R) + E_{\rm nn}(R)$ を求める。  
+全エネルギーは平衡距離 $R_e \approx 1.6$ a.u. で最小：
+
+| 実装 | パラメータ | $R_e$ [a.u.] | $E_{\rm tot}(R_e)$ [Ha] | $E_{\rm tot}(R=6)$ [Ha] |
+|---|---|---|---|---|
+| FD ([`FD/H2_fd_HF.cpp`](FD/H2_fd_HF.cpp))               | $\Delta x = 0.2$ | $\approx 1.6$ | $-1.42576$ | $-1.12084$ |
+| FEDVR ([`FEDVR/H2_fedvr_HF.cpp`](FEDVR/H2_fedvr_HF.cpp)) | $N_e=10$, $n=8$ | $\approx 1.6$ | $-1.42507$ | $-1.12053$ |
+
+両者の差は全 $R$ で $\sim 5\times10^{-4}$ Ha（離散化誤差レベル）。$R \to \infty$ で RHF が真の解離極限 $2 E_0^{\rm H} = -1.33954$ Ha に到達せず（$R=6$ で $-1.12$ Ha 止まり）、典型的な **RHF 解離問題** が観察できる。詳細・全 14 点のスキャン結果は [`FEDVR/README.md`](FEDVR/README.md) §13 を参照。
+
+#### 整合性チェック（平衡距離 $R = 1.6$ a.u. での 3 解法集約）
+
+[`H2_consistency_check.cpp`](H2_consistency_check.cpp) で平衡距離 $R = 1.6$ における (A) 第一量子化 Hartree+exchange 虚時間、(B) 第二量子化 RHF 虚時間、(C) 第二量子化 RHF SCF の集約を確認できる。He / Be で確認した数学的等価性が **多核外場でも維持される** こと（つまり多核 `build_h_pq` の実装に重大なバグがないこと）の検証。
+
+| | 解法 | $E_{\rm RHF}$ [Ha] | 反復 |
+|---|---|---|---|
+| FD ($\Delta x=0.2$, $N=199$) | (A) 第一量子化 Hartree+exchange 虚時間 | $-1.95575566606$ | 2878 |
+| FD | (B) 第二量子化 RHF 虚時間 | $-1.95575566606$ | 2878 |
+| FD | (C) 第二量子化 RHF SCF | $-1.95575678865$ | 16 |
+| FEDVR ($N_e=10$, $n=8$, $N=79$) | (B) 第二量子化 RHF 虚時間 | $-1.95506731179$ | 3009 |
+| FEDVR | (C) 第二量子化 RHF SCF | $-1.95506843152$ | 13 |
+
+各離散化内で **3 解法（FD）/ 2 解法（FEDVR）が $\sim 1\times10^{-6}$ Ha で集約**。FEDVR は第一量子化スタイルの多軌道ヘルパーを持たないので (A) は省略（Be も同様の事情）。
+
+```bash
+mkdir -p out
+EIGEN=/opt/homebrew/include/eigen3
+g++ -std=c++17 -O2 -I"$EIGEN" -I"FD" -I"FEDVR" H2_consistency_check.cpp -o out/h2_consistency_check
+./out/h2_consistency_check
+```
+
 ---
 
 ## Continuum-limit consistency check
