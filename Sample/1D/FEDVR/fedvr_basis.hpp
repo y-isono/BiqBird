@@ -385,4 +385,69 @@ private:
     }
 };
 
+// ============================================================================
+// Second-quantization integral tensors in the FEDVR basis.
+//
+// In the DVR basis, the four-index two-electron integral collapses to a
+// two-index object thanks to the diagonality of local operators:
+//
+//   V_{pqrs} = ∫∫ φ_p(x1) φ_q(x2) w(x1,x2) φ_r(x1) φ_s(x2) dx1 dx2
+//            ≈ δ_{pr} δ_{qs} · w(x_p, x_q)
+//
+// We expose this 2-index object as V_pq.  Together with the 1-index "diagonal
+// representation" of any local potential and the (sparse, banded) kinetic
+// matrix T already built into FEDVRGrid, this is everything needed to
+// formulate quantum-chemistry methods (HF, MP2, CI, ...) directly on the
+// FEDVR grid.
+//
+// References:
+//   - Rescigno & McCurdy, Phys. Rev. A 62, 032706 (2000)
+//   - Schneider et al., various papers on FEDVR-TDDFT
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// One-electron Hamiltonian matrix elements in the FEDVR basis:
+//   h_{pq} = T_{pq} + V_ext(x_p) δ_{pq}
+//
+// For a soft-Coulomb nucleus of charge Z at the origin (1D model):
+//   V_ext(x) = -Z / sqrt(x² + 1)
+//
+// Returned as a sparse symmetric matrix with bandwidth ~ 2 n_order + 1.
+// ----------------------------------------------------------------------------
+inline Eigen::SparseMatrix<double> build_h_pq(const FEDVRGrid &g, double Z)
+{
+    Eigen::SparseMatrix<double> h = g.T; // copy of kinetic-energy matrix
+    for (int p = 0; p < g.N; ++p)
+    {
+        const double Vp = -Z / std::sqrt(g.x(p) * g.x(p) + 1.0);
+        h.coeffRef(p, p) += Vp;
+    }
+    h.makeCompressed();
+    return h;
+}
+
+// ----------------------------------------------------------------------------
+// Two-electron integral kernel in the FEDVR basis:
+//   V_{pq} = w(x_p, x_q) = 1 / sqrt((x_p - x_q)² + 1)
+//
+// Full four-index integral in the DVR basis is
+//   V_{pqrs} = δ_{pr} δ_{qs} V_{pq}
+// so storing the N×N matrix V_{pq} suffices for any quantum-chemistry method.
+//
+// Returned as a dense N×N matrix (cheap for the typical N ~ 80 on this grid).
+// ----------------------------------------------------------------------------
+inline Eigen::MatrixXd build_V_pq(const FEDVRGrid &g)
+{
+    Eigen::MatrixXd V(g.N, g.N);
+    for (int p = 0; p < g.N; ++p)
+    {
+        for (int q = 0; q < g.N; ++q)
+        {
+            const double dx = g.x(p) - g.x(q);
+            V(p, q) = 1.0 / std::sqrt(dx * dx + 1.0);
+        }
+    }
+    return V;
+}
+
 } // namespace fedvr
