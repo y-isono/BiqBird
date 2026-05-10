@@ -1,0 +1,22 @@
+# build artifacts
+out/
+*.o
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.uv/
+*.egg-info/
+build/
+dist/
+
+# data (regenerated from C++)
+data/*.json
+
+# jupyter
+.ipynb_checkpoints/
+
+# editor
+.vscode/
+.idea/
