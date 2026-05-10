@@ -59,13 +59,81 @@ $$ i\frac{d}{dt}\Psi(t) = H_0\Psi(t) \longrightarrow \frac{d}{d\tau}\Psi(-i\tau)
 
 ## Implementation results（本リポジトリの実装による）
 
-| 実装 | $E_{\rm tot}$ | $E_1$ | $E_2$ | 反復回数 |
-|---|---|---|---|---|
-| FD ([`FD/He_GS.cpp`](FD/He_GS.cpp))           | -2.22837 | -2.94721 | 0.71884 | 239 |
-| FEDVR ([`FEDVR/He_fedvr_GS.cpp`](FEDVR/He_fedvr_GS.cpp)) | -2.22412 | -2.94774 | 0.72362 | 1949 |
+各実装で **RHF SCF**（Roothaan-Hall 直接対角化）を解いた結果。第一量子化スタイル虚時間 RK4・第二量子化虚時間 RK4 はそれぞれ同じ値（収束限界の範囲内）に集約することを各サブディレクトリの README で確認している。
 
-両者とも Hartree 平均場近似であり、相互に $\sim 0.004$ Ha の精度で一致。
-FCI の $-2.23826$ Ha との差 $\sim 0.014$ Ha は **相関エネルギー** に相当し、これは Hartree 近似の系統誤差として妥当。
+### He 原子（$Z=2$, $N_{\rm occ}=1$, $x_{\rm range}=20$）
+
+| 実装 | パラメータ | DOF | $E_{\rm RHF}$ [Ha] | 反復 |
+|---|---|---|---|---|
+| FD ([`FD/He_fd_HF.cpp`](FD/He_fd_HF.cpp))           | $\Delta x = 0.4$ | 99 | $-2.22893775$ | 12 |
+| FEDVR ([`FEDVR/He_fedvr_HF.cpp`](FEDVR/He_fedvr_HF.cpp)) | $N_e = 10$, $n = 8$ | 79 | $-2.22411984$ | 12 |
+
+両者とも閉殻 RHF 解で、相互に $\sim 0.005$ Ha 異なるが、これは離散化誤差。次節の連続極限スキャンで確認できる通り、両者を細かくしていけば共通の連続極限値（$\sim -2.2242$ Ha）に収束する。
+
+参照値（[Reference values](#reference-values既知文献値) 参照）：FCI（$-2.23826$ Ha）との差 $\sim 0.014$ Ha は RHF 近似の **相関エネルギー**。
+
+### Be 原子（$Z=4$, $N_{\rm occ}=2$, $x_{\rm range}=20$）
+
+| 実装 | パラメータ | DOF | $E_{\rm RHF}$ [Ha] | 反復 |
+|---|---|---|---|---|
+| FD ([`FD/Be_fd_HF.cpp`](FD/Be_fd_HF.cpp))           | $\Delta x = 0.2$ | 199 | $-6.74646782$ | 17 |
+| FEDVR ([`FEDVR/Be_fedvr_HF.cpp`](FEDVR/Be_fedvr_HF.cpp)) | $N_e = 10$, $n = 8$ | 79 | $-6.73934450$ | 16 |
+
+---
+
+## Continuum-limit consistency check
+
+FD（$\Delta x \to 0$）と FEDVR（$n_{\rm order} \to$ 大）は **異なる離散化スキーム**だが、両者を細かくしていけば **共通の連続極限値** に収束するはず。これを実機で確認するスクリプトが [`continuum_limit_scan.cpp`](continuum_limit_scan.cpp)。各設定で `fedvr::rhf_scf` を回し、得られた SCF エネルギーを比較する。
+
+ビルド・実行：
+
+```bash
+mkdir -p out
+EIGEN=/opt/homebrew/include/eigen3
+g++ -std=c++17 -O2 -I"$EIGEN" -I"FD" -I"FEDVR" continuum_limit_scan.cpp -o out/continuum_limit_scan
+./out/continuum_limit_scan
+```
+
+### He（$x_{\rm range}=20$）の結果
+
+| scheme | パラメータ | DOF | $E_{\rm RHF}$ [Ha] |
+|---|---|---|---|
+| FD     | $\Delta x = 0.4$    | 99   | $-2.22893775$ |
+| FD     | $\Delta x = 0.2$    | 199  | $-2.22537408$ |
+| FD     | $\Delta x = 0.1$    | 399  | $-2.22449966$ |
+| FD     | $\Delta x = 0.05$   | 799  | $-2.22428201$ |
+| FD     | $\Delta x = 0.025$  | 1599 | $-2.22422766$ |
+| FEDVR  | $N_e=10, n=4$       | 39   | $-2.20928079$ |
+| FEDVR  | $N_e=10, n=6$       | 59   | $-2.22526032$ |
+| FEDVR  | $N_e=10, n=8$       | 79   | $-2.22411984$ |
+| FEDVR  | $N_e=10, n=10$      | 99   | $-2.22421263$ |
+| FEDVR  | $N_e=10, n=12$      | 119  | $-2.22420920$ |
+
+→ FD は **下から**（過大評価、$O(\Delta x^2)$ で減衰）、FEDVR は **指数的**に収束し、両者は連続極限値 $\boxed{E_{\rm RHF}^{\rm He} \approx -2.22421 \text{ Ha}}$ で一致。最も細かい設定（FD $\Delta x=0.025$ vs FEDVR $n=12$）の差は $\sim 2\times10^{-5}$ Ha。
+
+### Be（$x_{\rm range}=20$）の結果
+
+| scheme | パラメータ | DOF | $E_{\rm RHF}$ [Ha] |
+|---|---|---|---|
+| FD     | $\Delta x = 0.2$    | 199  | $-6.74646782$ |
+| FD     | $\Delta x = 0.1$    | 399  | $-6.74119375$ |
+| FD     | $\Delta x = 0.05$   | 799  | $-6.73988501$ |
+| FD     | $\Delta x = 0.025$  | 1599 | $-6.73955842$ |
+| FEDVR  | $N_e=10, n=4$       | 39   | $-6.76854572$ |
+| FEDVR  | $N_e=10, n=6$       | 59   | $-6.74054447$ |
+| FEDVR  | $N_e=10, n=8$       | 79   | $-6.73934450$ |
+| FEDVR  | $N_e=10, n=10$      | 99   | $-6.73944845$ |
+| FEDVR  | $N_e=10, n=12$      | 119  | $-6.73944868$ |
+
+→ He と同じ傾向で、両者は $\boxed{E_{\rm RHF}^{\rm Be} \approx -6.7394 \text{ Ha}}$ あたりで一致（差 $\sim 10^{-4}$ Ha）。
+
+### 解釈
+
+- **FD は連続極限値より深い** ところに位置し、$\Delta x \to 0$ で上から漸近。これは FD 2 次中心差分の運動エネルギー演算子が連続 Laplacian の固有値を過小評価する性質に由来する（基底関数を陽に持たないため、有限基底変分原理を厳密には満たさない）。
+- **FEDVR は連続極限値の上下に振動的**に近づく（$n=4$ では浅め、$n=6$ で行き過ぎ、$n=8\to 12$ で正しい値に収束）。これは GLL 求積誤差と基底空間サイズのバランスで生じる典型挙動。
+- 両者が同じ連続極限値に集約することで、コード両系統に重大なバグがないことが確認できる。
+
+---
 
 ## H 原子の参考値
 
