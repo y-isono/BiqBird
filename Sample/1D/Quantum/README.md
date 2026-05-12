@@ -127,7 +127,7 @@ $$
 **2 電子積分** は DVR の局所性により 4 添字 $V_{pqrs}$ が 2 添字に **縮約**：
 
 $$
-V_{pqrs} = \iint \phi_p(x_1)\phi_q(x_2) \frac{1}{\sqrt{(x_1-x_2)^2+1}} \phi_r(x_1)\phi_s(x_2) \ dx_1 dx_2 \approx \delta_{pr}\delta_{qs} V_{pq}
+V_{pqrs} = \iint \phi_p(x_1)\phi_q(x_2) \frac{1}{\sqrt{(x_1-x_2)^2+1}} \phi_r(x_1)\phi_s(x_2) dx_1 dx_2 \approx \delta_{pr}\delta_{qs} V_{pq}
 $$
 
 ここで
@@ -146,7 +146,7 @@ $$
 DVR 縮約を代入した電子部分は
 
 $$
-\hat H_{\mathrm{el}} = \sum_{p,q,\sigma} h_{pq} \ c^\dagger_{p\sigma} c_{q\sigma} + \frac{1}{2} \sum_{p,q}\sum_{\sigma,\sigma'} V_{pq} \ c^\dagger_{p\sigma} c^\dagger_{q\sigma'} c_{q\sigma'} c_{p\sigma}
+\hat H_{\mathrm{el}} = \sum_{p,q,\sigma} h_{pq} c^\dagger_{p\sigma} c_{q\sigma} + \frac{1}{2} \sum_{p,q}\sum_{\sigma,\sigma'} V_{pq} c^\dagger_{p\sigma} c^\dagger_{q\sigma'} c_{q\sigma'} c_{p\sigma}
 $$
 
 $p = q$ かつ $\sigma = \sigma'$ の項は Pauli 排他律により $c^\dagger c^\dagger = 0$ で自動消滅。
@@ -188,7 +188,7 @@ $$
 **Slater 行列式（占有数表現）と 1 対 1 対応**：
 
 $$
-|x\rangle = \prod_{k \ : \ x_k = 1} c^\dagger_k |\text{vac}\rangle
+|x\rangle = \prod_{k : x_k = 1} c^\dagger_k |\text{vac}\rangle
 $$
 
 総 qubit 数：
@@ -501,7 +501,7 @@ $$
 測定確率：
 
 $$
-P(\text{ancilla} = 0) = \cos^2\!\Bigl(\tfrac{\theta_k - \omega_k}{2}\Bigr)
+P(\text{ancilla} = 0) = \cos^2\Bigl(\tfrac{\theta_k - \omega_k}{2}\Bigr)
 $$
 
 #### 6.2.2 フィードフォワード補正の導出
@@ -614,7 +614,7 @@ fault-tolerant 量子コンピュータ前提。
 
 $\hat H$ の JW 像を 2 つに分ける：
 
-- $\hat T$ : **計算基底で非対角な** Pauli string（kinetic + exchange、 $XX$/$YY$ 含むもの）
+- $\hat T$ : **計算基底で非対角な** Pauli string（kinetic + exchange、 $XX$ / $YY$ 含むもの）
 - $\hat V$ : **計算基底で対角な** Pauli string（external pot + Coulomb、 $Z$ と $ZZ$ のみ）
 
 §3.3 で見た通り DVR では 2-body 項が完全に対角に落ちるので、
@@ -813,7 +813,7 @@ $\Delta E_{\mathrm{corr}} = E_{\mathrm{tot}}^{\mathrm{RHF}} - E_{\mathrm{tot}}^{
   量子（ $N_{\mathrm{DVR}}=9$ の粗いグリッド）のグリッド差
 - $R \ge 1.6$ で量子が一貫して下回り、**$R = 6.0$ では $0.31$ Ha の差**：
   これが教科書的な「RHF 解離破綻 vs FCI/quantum の正しい解離」のデモ
-- 解離極限 $2 E_0^{\mathrm{H}} \approx -1.34$ Ha に対し量子が $-1.43$ （やや深め=$N_{\mathrm{DVR}}=9$ の粗さで H 原子が深い）、
+- 解離極限 $2 E_0^{\mathrm{H}} \approx -1.34$ Ha に対し量子が $-1.43$ （やや深め = $N_{\mathrm{DVR}}=9$ の粗さで H 原子が深い）、
   RHF は $-1.12$ で大きく上に詰まる
 
 ### 9.4 Phase Q4 : Trotter 時間発展（GS のエネルギー保存）
